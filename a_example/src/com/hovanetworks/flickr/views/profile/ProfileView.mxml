@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:View xmlns:fx="http://ns.adobe.com/mxml/2009" viewActivate="onActivate()"
+		xmlns:s="library://ns.adobe.com/flex/spark" title="Resultados">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.aovazquez.flickrLib.Flickr;
+			
+			import mx.collections.ArrayCollection;
+			import mx.core.FlexGlobals;
+			
+			import spark.events.IndexChangeEvent;
+			public var flickr:Flickr = new Flickr('bb50b1daedcacc316c2f0a5fc55d73ed');
+			private var photosArray:ArrayCollection = new ArrayCollection(); 
+			
+			public function onActivate():void
+			{
+				var o:Object = new Object();
+				o.tags = String(data.tags);
+				lblPhotosName.text = String(data.tags);
+				bsIndi.visible = true;
+				flickr.call(Flickr.SEARCH_PHOTOS_USER, o, onResultGetPhotos);
+			}
+			
+			private function onResultGetPhotos(event:Event):void
+			{
+				var data:Object =JSON.parse(event.target.data);
+				photosArray = flickr.getArrayPhotosImages(data.photos.photo);
+				photosList.dataProvider = photosArray;
+				bsIndi.visible = false;
+			}
+			
+			protected function photosList_changeHandler(event:IndexChangeEvent):void
+			{
+				var o:Object 	= new Object();
+				o 				= photosArray.getItemAt( event.newIndex );
+				Flickr_android(FlexGlobals.topLevelApplication).showView( Flickr_android.PICTURE,o);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:navigationContent>
+		<s:Button label="atras" click="navigator.popView()"/>
+	</s:navigationContent>
+	
+	<s:VGroup width="100%" height="100%" paddingTop="10" paddingBottom="10">
+		<s:VGroup gap="1">
+			<s:Label text="Resultados de" fontWeight="bold" fontSize="12"/>
+			<s:Label id="lblPhotosName" fontSize="15"/>
+		</s:VGroup>
+		<s:List id="photosList"
+				borderVisible="false" horizontalScrollPolicy="off"
+				height="100%" width="100%"
+				itemRenderer="com.hovanetworks.flickr.views.profile.render.PhotosFlickr" change="photosList_changeHandler(event)">
+			<s:layout>
+				<!--<s:VerticalLayout gap="10" />-->
+				<s:TileLayout />
+			</s:layout>
+		</s:List>
+	
+	</s:VGroup>
+	
+	<s:BusyIndicator id="bsIndi" visible="false" horizontalCenter="0" verticalCenter="0" height="30" width="30" />
+</s:View>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" creationComplete="application1_creationCompleteHandler(event)"
+			   xmlns:s="library://ns.adobe.com/flex/spark" applicationDPI="160">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.aovazquez.flickrLib.Flickr;
+			import com.hovanetworks.flickr.views.picture.PictureInfoView;
+			import com.hovanetworks.flickr.views.profile.ProfileView;
+			import com.hovanetworks.flickr.views.search.SearchView;
+			
+			import mx.events.FlexEvent;
+			
+			public static const SEARCH:String			= "SEARCH_VIEW";
+			public static const USER_PROFILE:String		= "USER_PROFILE_VIEW";
+			public static const PICTURE:String			= "PICTURE_VIEW";
+			
+			private static const flickr:Flickr = new Flickr('bb50b1daedcacc316c2f0a5fc55d73ed');
+			
+			
+			
+			
+			public function showView(tabName:String, objData:Object = null):void
+			{	
+				switch(tabName)
+				{
+					case SEARCH:
+						MESSAGES_VIEW.pushView( SearchView,objData );
+						break;
+					
+					case USER_PROFILE:
+						MESSAGES_VIEW.pushView( ProfileView, objData );
+						break;
+					
+					case PICTURE:
+						MESSAGES_VIEW.pushView( PictureInfoView, objData );
+						break;
+				}
+			}
+			
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				NativeApplication.nativeApplication.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+			}
+			
+			protected function onKeyDown(event:KeyboardEvent):void
+			{
+				switch(event.keyCode)
+				{
+					case Keyboard.BACK: // user hit the back button on Android device
+						// case 94: // was hard-coded for older build of SDK supporting eclair
+					{  
+						event.preventDefault();
+						event.stopImmediatePropagation();
+						
+						if (MESSAGES_VIEW.activeView is ProfileView)
+							MESSAGES_VIEW.popView();
+						
+						if (MESSAGES_VIEW.activeView is PictureInfoView)
+							MESSAGES_VIEW.popView();
+						
+						break;
+					}
+				}
+			}
+		]]>
+	</fx:Script>
+	
+	<s:ViewNavigator id="MESSAGES_VIEW" 
+					 firstView="com.hovanetworks.flickr.views.search.SearchView" top="0" left="0" right="0" bottom="0">
+	</s:ViewNavigator>
+	
+</s:Application>
